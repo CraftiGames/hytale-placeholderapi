@@ -1,5 +1,8 @@
 package at.helpch.placeholderapi.updatechecker;
 
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.component.Ref;
 import at.helpch.placeholderapi.PlaceholderAPIPlugin;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -99,7 +102,13 @@ public class UpdateChecker {
     }
 
     public void onJoin(PlayerReadyEvent e) {
-        if (e.getPlayer().hasPermission("placeholderapi.updatenotify")) {
+        // Player#hasPermission/#sendMessage were removed in Update 5; both live on the PlayerRef component now.
+        final Ref<EntityStore> ref = e.getPlayerRef();
+        if (ref == null || !ref.isValid()) {
+            return;
+        }
+        final PlayerRef player = ref.getStore().getComponent(ref, PlayerRef.getComponentType());
+        if (player != null && player.hasPermission("placeholderapi.updatenotify")) {
             final Message message = Message.raw("An update for ").color(Color.CYAN)
                     .insert(Message.raw("Placeholder").color(Color.WHITE))
                     .insert(Message.raw("API").color(Color.LIGHT_GRAY))
@@ -110,7 +119,7 @@ public class UpdateChecker {
                     .insert(Message.raw(")").color(Color.YELLOW))
                     .insert(Message.raw("\nis available at ").color(Color.CYAN))
                     .insert(Message.raw("https://placeholderapi.com/download").color(Color.YELLOW).link("https://www.curseforge.com/hytale/mods/placeholder-api").bold(true).italic(true));
-            e.getPlayer().sendMessage(message);
+            player.sendMessage(message);
         }
     }
 }

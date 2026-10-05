@@ -35,14 +35,15 @@ public final class MessageReplacer {
             message = message.link(link);
         }
 
-        int bold = original.getFormattedMessage().bold.getValue();
-        if (bold != 0) {
-            message = message.bold(bold != 1);
+        // Since Update 5 FormattedMessage.bold/italic are nullable Booleans (null = inherit) instead of MaybeBool.
+        final Boolean bold = original.getFormattedMessage().bold;
+        if (bold != null) {
+            message = message.bold(bold);
         }
 
-        int italic = original.getFormattedMessage().italic.getValue();
-        if (italic != 0) {
-            message = message.italic(italic != 1);
+        final Boolean italic = original.getFormattedMessage().italic;
+        if (italic != null) {
+            message = message.italic(italic);
         }
 
         return message.insertAll(newChildren);

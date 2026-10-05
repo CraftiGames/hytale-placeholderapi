@@ -21,6 +21,7 @@
 package at.helpch.placeholderapi.commands;
 
 
+import com.hypixel.hytale.server.core.command.system.CommandOwner;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -78,9 +79,14 @@ public final class PlaceholderCommandRouter extends AbstractCommand {
         this.commands = commands;
     }
 
+    // Update 6 removed canGeneratePermission(); opt out of the engine-generated node instead, so /papi keeps
+    // checking the per-subcommand permissions itself (unless a permission was set explicitly).
     @Override
-    protected boolean canGeneratePermission() {
-        return false;
+    public void setOwner(@NotNull final CommandOwner owner) {
+        if (getPermission() == null && !hasBeenRegistered()) {
+            requireNoPermission();
+        }
+        super.setOwner(owner);
     }
 
     @Override
